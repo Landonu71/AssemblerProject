@@ -527,7 +527,7 @@ char* readParam(char* line, struct Param* param) {
 	if (strcmp(OP_CODE, "LW") == 0 || strcmp(OP_CODE, "SW") == 0 || strcmp(OP_CODE, "MFLO") == 0 || strcmp(OP_CODE, "MFHI") == 0) {
 		comma_flag = 1;
 	}
-	if ((comma_flag == 0) ) {
+	if (comma_flag == 0 ) {
 		if (*line != ',') {
 			state = MISSING_COMMA;
 		}
