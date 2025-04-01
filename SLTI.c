@@ -36,10 +36,6 @@ void slti_immd_assm(void) {
         state = INVALID_REG;
         return;
     }
-    if (PARAM3.value > 0x7FFF || PARAM3.value < -0x8000) {
-        state = INVALID_IMMED;
-        return;
-    }
 
     /* 
         Encode binary: I-format (op=0x0A)
