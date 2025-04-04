@@ -35,17 +35,19 @@ void mfhi_reg_assm(void) {
         Format: [op(6)][0(5)][rd(5)][0(5)][funct(6)]
     */
     setBits_str(31, "000000");       // Opcode (0)
+    setBits_str(6, "00000");         // rs (5 bits) = 0 (unused)
+    setBits_str(11, "00000");        // rt (5 bits) = 0 (unused)
     setBits_num(15, PARAM1.value, 5); // Rd (destination)
-    setBits_str(5, "010010");        // Funct (0x10)
-    setBits_str(10, "00000");        // Unused (0)
-    setBits_str(25, "0000000000");   // Unused (0)
+    setBits_str(5, "010000");        // Funct (0x10)
+    setBits_str(16, "00000");        // shamt (5 bits) = 0 (unused)
+    setBits_str(26, "010000");       // funct (6 bits) = 0x10 (MFHI)
 
     state = COMPLETE_ENCODE;
 }
 
 void mfhi_reg_bin(void) {
     // Check opcode (0) and funct (0x10), with unused bits as 0
-    if (checkBits(31, "000000") != 0 || checkBits(5, "010010") != 0 ||
+    if (checkBits(31, "000000") != 0 || checkBits(5, "010000") != 0 ||
         checkBits(25, "0000000000") != 0 || checkBits(10, "00000") != 0) {
         state = WRONG_COMMAND;
         return;
