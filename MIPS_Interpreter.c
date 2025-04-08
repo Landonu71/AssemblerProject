@@ -73,7 +73,7 @@ void test(void) {
 }
 
 void testBench(void) {
-	
+
 	// Prints out the test bench header
 	puts("");
 	puts("/===========================/");
@@ -81,6 +81,18 @@ void testBench(void) {
 	puts("/===========================/");
 	puts("");
 
+	typedef struct {
+        char command[50];
+        char expected[50];
+    } TestCase;
+
+	TestCase tests[] = {
+        {"AND $t1, $t2, $t3", "0000 0001 0100 1011 0100 1000 0010 0100"},
+        {"OR $t0, $t1, $t2",  "0000 0001 0010 1010 0100 0000 0010 0101"},
+        {"ADD $s0, $s1, $s2", "0000 0010 0011 0010 1000 0000 0010 0000"},
+        {"BNE $t0, $t1, #42",  "0001 0101 0010 1000 0000 0000 0010 1010"},
+        {"SLTI $t2, $t3, #-5", "0010 1001 0110 1010 1111 1111 1111 1011"}
+    };
 
 	// Initiazlies the test case char array and adds all test cases
 	char testCases[5][50];
@@ -89,6 +101,13 @@ void testBench(void) {
 	strcpy(testCases[2], "AND $t1, $t2, $t3");
 	strcpy(testCases[3], "AND $t1, $t2, $t3");
 	strcpy(testCases[4], "AND $t1, $t2, $t3");
+
+	char testHexCases[5][50];
+	strcpy(testHexCases[0], "0x014b4824");
+	strcpy(testHexCases[1], "0x014b4824");
+	strcpy(testHexCases[2], "0x014b4824");
+	strcpy(testHexCases[3], "0x014b4824");
+	strcpy(testHexCases[4], "0x014b4824");
 	
 
 	// Initiazlies the expected results char array and adds all expected results
@@ -99,8 +118,15 @@ void testBench(void) {
 	strcpy(expectedResults[3], "0000 0001 0100 1011 0100 1000 0010 0100");
 	strcpy(expectedResults[4], "0000 0001 0100 1011 0100 1000 0010 0100");
 
+	char expectedHexResults[5][50];
+	strcpy(expectedHexResults[0], "0x014B4824");
+	strcpy(expectedHexResults[1], "0x014B4824");
+	strcpy(expectedHexResults[2], "0x014B4824");
+	strcpy(expectedHexResults[3], "0x014B4824");
+	strcpy(expectedHexResults[4], "0x014B4824");
+
 	// Initilizes the number of test cases
-	int numTests = sizeof(testCases) / sizeof(testCases[0]);
+	int numTests = sizeof(tests)/sizeof(tests[0]);
 	
 	// Initilizes the binary variable to be used for testing
 	char actualBinary[50];
@@ -112,7 +138,7 @@ void testBench(void) {
 	for(int i = 0; i < numTests; i++) {
 		
 		// For some reason, the test cases will not print correctly after the first one.  I have no idea why.
-		printf("TEST COMMAND: %s\n", testCases[i]);
+		printf("TEST %d/%d: %s\n", i+1, numTests, tests[i].command);
 
 		// Calls the modded assembly to machine function to convert the test case to binary
 		moddedAssembly2machine(testCases[i]);
@@ -146,7 +172,26 @@ void testBench(void) {
 		}
 
 		for(int j = 0; j < numTests; j++) {
-			moddedHex2assembly(expectedResults[j]);
+			char newInstruct[50];
+			char appendTo[50] = "0x0";
+			printf("TEST COMMAND ASSEMBLY TO HEX: %s\n", testHexCases[j]);
+
+			moddedHex2assembly(testHexCases[j]);
+			itoa(instruct, newInstruct, 16);
+			strcat(appendTo, newInstruct);
+
+			if(strcmp(appendTo, testHexCases[j]) == 0) {
+				puts("TEST PASSED");
+			}
+	
+			else {
+				puts("TEST FAILED");
+				printf("EXPECTED HEX: %s\n", testHexCases[j]);
+				printf("ACTUAL HEX: %s\n", appendTo);
+				break;
+			}
+
+
 		}
 	}
 }
@@ -228,28 +273,24 @@ void machine2assembly(char* buff) {
 	}
 }
 void moddedHex2assembly(char* buff) {
-	while (1) {
-		// prompts and takes input
-		char* test = malloc(strlen(buff) + 1);
-		memset(buff, '\0', BUFF_SIZE);
-		strcpy(buff, test);
-		buff[strlen(buff)] = '\0';
+		
+	// prompts and takes input
+	char* test = malloc(strlen(buff) + 1);
+		
+	strcpy(test, buff);
+		
 
-		// if the string is empty, go back to the previous menu
-		if (strlen(buff) == 0) {
-			break;
-		}
-
-		// tries to parse the number
-		parseHex(buff);
-
-		// checks if there was an error, and decodes if there wasn't
-		if (state == NO_ERROR) {
-			decode();
-		}
-
-		// either prints an error message or the encoded instruction
-		printResult();
+	// if the string is empty, go back to the previous menu
+	if (strlen(buff) == 0) {
+		return;
+	}
+		
+	// tries to parse the number
+	parseHex(buff);
+		
+	// checks if there was an error, and decodes if there wasn't
+	if (state == NO_ERROR) {
+		decode();
 	}
 }
 
@@ -336,7 +377,6 @@ void hex2assembly(char* buff) {
 			decode();
 		}
 
-		// either prints an error message or the encoded instruction
 		printResult();
 	}
 }
