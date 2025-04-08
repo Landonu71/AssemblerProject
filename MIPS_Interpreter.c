@@ -17,6 +17,7 @@ int main(void) {
 		puts("\nPlease enter an option:");
 		puts("\t(1) Assembly to Machine Code");
 		puts("\t(2) Machine Code to Assembly");
+		puts("\t(Test Bench) Test Bench");
 		puts("\t(3) Quit");
 		printf("\n> ");
 
@@ -32,6 +33,24 @@ int main(void) {
 		}
 		else if (strcmp(buffer, "3") == 0) {
 			return 0;
+		}
+		else if (strcmp(buffer, "Test Bench") == 0) {
+			// test bench
+			testBench();
+		}
+		else if (strcmp(buffer, "Test") == 0) {
+			// test bench
+			test();
+		}
+		else if (strcmp(buffer, "TEST") == 0) {
+			// test bench
+			test();
+		}
+		else if (strcmp(buffer, "Tewst") == 0) {
+			test();
+		}
+		else if (strcmp(buffer, "TEWST") == 0) {
+			test();
 		}
 		else if (strcmp(buffer, "test") == 0) {
 			test();
@@ -51,6 +70,58 @@ void test(void) {
 	parseAssem(buff);
 	printResult();
 	printAssm();
+}
+
+void testBench(void) {
+	
+	puts("Test Bench Running...");
+
+	char testCases[5][50];
+	strcpy(testCases[0], "AND $t1, $t2, $t3");
+	strcpy(testCases[1], "AND $t1, $t2, $t3");
+	strcpy(testCases[2], "AND $t1, $t2, $t3");
+	strcpy(testCases[3], "AND $t1, $t2, $t3");
+	strcpy(testCases[4], "AND $t1, $t2, $t3");
+	
+	char expectedResults[5][50];
+	strcpy(expectedResults[0], "0000 0001 0100 1011 0100 1000 0010 0100");
+	strcpy(expectedResults[1], "0000 0001 0100 1011 0100 1000 0010 0100");
+	strcpy(expectedResults[2], "0000 0001 0100 1011 0100 1000 0010 0100");
+	strcpy(expectedResults[3], "0000 0001 0100 1011 0100 1000 0010 0100");
+	strcpy(expectedResults[4], "0000 0001 0100 1011 0100 1000 0010 0100");
+
+	int numTests = sizeof(testCases) / sizeof(testCases[0]);
+	
+	char actualBinary[50];
+	
+	int x = 0;
+	for(int i = 0; i < numTests; i++) {
+		// For some reason, the test cases will not print correctly after the first one.  I have no idea why.
+		printf("TEST COMMAND: %s\n", testCases[i]);
+		moddedAssembly2machine(testCases[i]);
+		x = 0;
+		for (int y = 31; y >= 0; y--) {
+			
+			actualBinary[x++] = ((BIN32 >> y) & 1) ? '1' : '0';
+			
+			if (y % 4 == 0 && y != 0) {
+				actualBinary[x++] = ' ';
+			}
+		}
+
+		actualBinary[x] = '\0';
+
+		if(strcmp(actualBinary, expectedResults[i]) == 0) {
+			puts("TEST PASSED");
+		}
+
+		else {
+			puts("TEST FAILED");
+			printf("EXPECTED BINARY: %s\n", expectedResults[i]);
+			printf("ACTUAL BINARY: %s\n", actualBinary);
+			break;
+		}
+	}
 }
 
 /*
@@ -128,6 +199,30 @@ void machine2assembly(char* buff) {
 			}
 		}
 	}
+}
+
+void moddedAssembly2machine(char* buff) {
+	
+		char* test = malloc(strlen(buff) + 1);
+		strcpy(test, buff);
+		// prompts and takes input
+		memset(buff, '\0', BUFF_SIZE);
+		strcpy(buff, test);
+		buff[strlen(buff)] = '\0';
+		// if the string is empty, go back to the previous menu
+		if (strlen(buff) == 0) {
+			return;
+		}
+
+		// tries to parse the instruction
+		parseAssem(buff);
+
+		// checks if there was an error, and encodes if there wasn't
+		if (state == NO_ERROR) {
+			encode();
+		}
+
+	
 }
 
 

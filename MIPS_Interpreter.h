@@ -9,13 +9,13 @@
 
 // buffer size constant
 #define BUFF_SIZE 100
-
+void moddedAssembly2machine(char* buff);
 /*
-	Purpose: dummy function to test code
+	Purpose: runs the test bench for the program
 	Params: none
 	Return: none
 */
-void test(void);
+void testBench(void);
 
 /*
 	Purpose: dummy function to test code
