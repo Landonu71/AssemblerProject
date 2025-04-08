@@ -10,6 +10,7 @@
 // buffer size constant
 #define BUFF_SIZE 100
 void moddedAssembly2machine(char* buff);
+void moddedHex2assembly(char* buff);
 /*
 	Purpose: runs the test bench for the program
 	Params: none

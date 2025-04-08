@@ -74,8 +74,15 @@ void test(void) {
 
 void testBench(void) {
 	
+	// Prints out the test bench header
+	puts("");
+	puts("/===========================/");
 	puts("Test Bench Running...");
+	puts("/===========================/");
+	puts("");
 
+
+	// Initiazlies the test case char array and adds all test cases
 	char testCases[5][50];
 	strcpy(testCases[0], "AND $t1, $t2, $t3");
 	strcpy(testCases[1], "AND $t1, $t2, $t3");
@@ -83,6 +90,8 @@ void testBench(void) {
 	strcpy(testCases[3], "AND $t1, $t2, $t3");
 	strcpy(testCases[4], "AND $t1, $t2, $t3");
 	
+
+	// Initiazlies the expected results char array and adds all expected results
 	char expectedResults[5][50];
 	strcpy(expectedResults[0], "0000 0001 0100 1011 0100 1000 0010 0100");
 	strcpy(expectedResults[1], "0000 0001 0100 1011 0100 1000 0010 0100");
@@ -90,27 +99,41 @@ void testBench(void) {
 	strcpy(expectedResults[3], "0000 0001 0100 1011 0100 1000 0010 0100");
 	strcpy(expectedResults[4], "0000 0001 0100 1011 0100 1000 0010 0100");
 
+	// Initilizes the number of test cases
 	int numTests = sizeof(testCases) / sizeof(testCases[0]);
 	
+	// Initilizes the binary variable to be used for testing
 	char actualBinary[50];
 	
+
 	int x = 0;
+
+	// Loops through every test case 
 	for(int i = 0; i < numTests; i++) {
+		
 		// For some reason, the test cases will not print correctly after the first one.  I have no idea why.
 		printf("TEST COMMAND: %s\n", testCases[i]);
+
+		// Calls the modded assembly to machine function to convert the test case to binary
 		moddedAssembly2machine(testCases[i]);
+
 		x = 0;
+		// Loops through every bit in the BIN32 variable and copies the each bit to the actualBinary array
 		for (int y = 31; y >= 0; y--) {
 			
+			// Sets each bit from BIN32 to the actualBinary array
 			actualBinary[x++] = ((BIN32 >> y) & 1) ? '1' : '0';
 			
+			// Adds a space every 4 bits for readability
 			if (y % 4 == 0 && y != 0) {
 				actualBinary[x++] = ' ';
 			}
 		}
 
+		// Null terminates the string
 		actualBinary[x] = '\0';
 
+		// Prints "TEST PASSED" if the test case passed, otherwise prints "TEST FAILED" and the expected and actual results
 		if(strcmp(actualBinary, expectedResults[i]) == 0) {
 			puts("TEST PASSED");
 		}
@@ -120,6 +143,10 @@ void testBench(void) {
 			printf("EXPECTED BINARY: %s\n", expectedResults[i]);
 			printf("ACTUAL BINARY: %s\n", actualBinary);
 			break;
+		}
+
+		for(int j = 0; j < numTests; j++) {
+			moddedHex2assembly(expectedResults[j]);
 		}
 	}
 }
@@ -198,6 +225,31 @@ void machine2assembly(char* buff) {
 				return;
 			}
 		}
+	}
+}
+void moddedHex2assembly(char* buff) {
+	while (1) {
+		// prompts and takes input
+		char* test = malloc(strlen(buff) + 1);
+		memset(buff, '\0', BUFF_SIZE);
+		strcpy(buff, test);
+		buff[strlen(buff)] = '\0';
+
+		// if the string is empty, go back to the previous menu
+		if (strlen(buff) == 0) {
+			break;
+		}
+
+		// tries to parse the number
+		parseHex(buff);
+
+		// checks if there was an error, and decodes if there wasn't
+		if (state == NO_ERROR) {
+			decode();
+		}
+
+		// either prints an error message or the encoded instruction
+		printResult();
 	}
 }
 
