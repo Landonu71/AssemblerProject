@@ -74,109 +74,99 @@ void test(void) {
 
 void testBench(void) {
 
-	// Prints out the test bench header
-	puts("");
-	puts("/===========================/");
-	puts("Test Bench Running...");
-	puts("/===========================/");
-	puts("");
+    // Prints out the test bench header
+    puts("");
+    puts("/===========================/");
+    puts("Test Bench Running...");
+    puts("/===========================/");
+    puts("");
 
-	typedef struct {
-        char command[50];
-        char expected1[50];
-		char expected2[50];
+    // Define a structure to hold a single test case
+    typedef struct {
+        char command[50];     // Assembly instruction as a string
+        char expected1[50];   // Expected binary output (formatted)
+        char expected2[50];   // Expected hexadecimal output
     } TestCase;
 
-	TestCase tests[] = {
+    // Initialize the array of test cases
+    TestCase tests[] = {
         {"AND $t1, $t2, $t3", "0000 0001 0100 1011 0100 1000 0010 0100", "0x014b4824"},
         {"ADD $s0, $s1, $s2", "0000 0010 0011 0010 1000 0000 0010 0000", "0x02328020"},
-        {"BNE $t0, $t1, #42",  "0001 0101 0010 1000 0000 0000 0010 1010", "0x1528002a"},
+        {"BNE $t0, $t1, #42", "0001 0101 0010 1000 0000 0000 0010 1010", "0x1528002a"},
         {"SLTI $t2, $t3, #5", "0010 1001 0110 1010 0000 0000 0000 0101", "0x296a0005"},
-		{"OR $t0, $t1, $t2",  "0000 0001 0010 1010 0100 0000 0010 0101", "0x012a4025"}
+        {"OR $t0, $t1, $t2",  "0000 0001 0010 1010 0100 0000 0010 0101", "0x012a4025"}
     };
 
-	// Initilizes the number of test cases
-	int numTests = sizeof(tests)/sizeof(tests[0]);
-	
-	// Initilizes the binary variable to be used for testing
-	char actualBinary[50];
-	
+    // Determine the number of test cases
+    int numTests = sizeof(tests) / sizeof(tests[0]);
 
-	int x = 0;
+    // Buffer to hold the actual binary string generated
+    char actualBinary[50];
+    int x = 0;
 
-	// Loops through every test case 
-	for(int i = 0; i < numTests; i++) {
-		char command[50];  
-		strcpy(command, tests[i].command);
-		
-		printf("TEST %d/%d: %s\n", i+1, numTests, tests[i].command);
+    // Loop through each test case
+    for (int i = 0; i < numTests; i++) {
+        char command[50];
+        strcpy(command, tests[i].command);  // Copy current command into local buffer
 
-		// Calls the modded assembly to machine function to convert the test case to binary
-		moddedAssembly2machine(command);
-		char instruction[50];
-		char appendTo[50] = "";
-		if(tests[i].expected2[2] == '0') {
-			strcpy(appendTo, "0x0");
-		}
-		else {
-			strcpy(appendTo, "0x");
-		}
-		
-		itoa(instruct, instruction, 16);
-		strcat(appendTo, instruction);
-		x = 0;
+        printf("TEST %d/%d: %s\n", i + 1, numTests, tests[i].command);
 
-		// Loops through every bit in the BIN32 variable and copies the each bit to the actualBinary array
-		for (int y = 31; y >= 0; y--) {
-			
-			// Sets each bit from BIN32 to the actualBinary array
-			actualBinary[x++] = ((BIN32 >> y) & 1) ? '1' : '0';
-			
-			// Adds a space every 4 bits for readability
-			if (y % 4 == 0 && y != 0) {
-				actualBinary[x++] = ' ';
-			}
-		}
+        // Convert assembly instruction to machine code (binary and hex)
+        moddedAssembly2machine(command);
 
-		// Null terminates the string
-		actualBinary[x] = '\0';
-		// Prints "TEST PASSED" if the test case passed, otherwise prints "TEST FAILED" and the expected and actual results
-		if(strcmp(actualBinary, tests[i].expected1) == 0 && strcmp(appendTo, tests[i].expected2) == 0) {
-			puts("ASSEMBLY TO BINARY AND HEX TEST PASSED");
-		}
+        char instruction[50];
+        char appendTo[50] = "";
 
-		else {
-			puts("ASSEMBLY TO BINARY AND HEX TEST FAILED");
-			printf("EXPECTED BINARY: %s\n", tests[i].expected1);
-			printf("ACTUAL BINARY: %s\n", actualBinary);
-			printf("EXPECTED HEX: %s\n", tests[i].expected2);
-			printf("ACTUAL HEX: %s\n", appendTo);
-			break;
-		}
+        // Add appropriate hex prefix
+        if (tests[i].expected2[2] == '0') {
+            strcpy(appendTo, "0x0");
+        } else {
+            strcpy(appendTo, "0x");
+        }
 
-		
-		
-			
-			char decodedInstruct[50];
-			char expectedHex[50];
-			printf("TEST COMMAND HEX TO ASSEMBLY: %s\n", tests[i].command);
-	
-			moddedHex2assembly(appendTo);
-			char* temp = getAssemblyString();
+        // Convert the global `instruct` variable (assumed to hold hex value) to hex string
+        itoa(instruct, instruction, 16);
+        strcat(appendTo, instruction);  // Complete the hex string
+        x = 0;
 
-			if(strcmp(temp, tests[i].command) == 0) {
-				puts("MACHINE CODE TO ASSEMBLY TEST PASSED");
-			}
+        // Convert BIN32 to formatted binary string with spaces every 4 bits
+        for (int y = 31; y >= 0; y--) {
+            actualBinary[x++] = ((BIN32 >> y) & 1) ? '1' : '0';
+            if (y % 4 == 0 && y != 0) {
+                actualBinary[x++] = ' ';
+            }
+        }
+        actualBinary[x] = '\0';  // Null-terminate the binary string
 
-			else {
-				puts("HEX TO ASSEMBLY TEST FAILED");
-				printf("EXPECTED COMMAND: %s\n", tests[i].command);
-				printf("ACTUAL COMMAND: %s\n", temp);
-				break;
-			}
-		
-	}
-}	
+        // Compare generated binary and hex strings to expected outputs
+        if (strcmp(actualBinary, tests[i].expected1) == 0 && strcmp(appendTo, tests[i].expected2) == 0) {
+            puts("ASSEMBLY TO BINARY AND HEX TEST PASSED");
+        } else {
+            // Print error and exit loop if there's a mismatch
+            puts("ASSEMBLY TO BINARY AND HEX TEST FAILED");
+            printf("EXPECTED BINARY: %s\n", tests[i].expected1);
+            printf("ACTUAL BINARY:   %s\n", actualBinary);
+            printf("EXPECTED HEX:    %s\n", tests[i].expected2);
+            printf("ACTUAL HEX:      %s\n", appendTo);
+            break;
+        }
+
+        // Begin test for converting hex back to assembly
+        printf("TEST COMMAND HEX TO ASSEMBLY: %s\n", tests[i].command);
+
+        moddedHex2assembly(appendTo);         // Convert hex string back to assembly
+        char* temp = getAssemblyString();     // Retrieve generated assembly string
+
+        if (strcmp(temp, tests[i].command) == 0) {
+            puts("MACHINE CODE TO ASSEMBLY TEST PASSED");
+        } else {
+            puts("HEX TO ASSEMBLY TEST FAILED");
+            printf("EXPECTED COMMAND: %s\n", tests[i].command);
+            printf("ACTUAL COMMAND:   %s\n", temp);
+            break;
+        }
+    }
+}
 
 /*
 	Purpose: initializes anything that needs to be initialized
