@@ -156,6 +156,7 @@ void testBench(void) {
         moddedHex2assembly(appendTo);         // Convert hex string back to assembly
         char* temp = getAssemblyString();     // Retrieve generated assembly string
 
+		// Handles passing and failing cases
         if (strcmp(temp, tests[i].command) == 0) {
             puts("HEX CODE TO ASSEMBLY TEST PASSED");
         } else {
@@ -165,10 +166,12 @@ void testBench(void) {
             break;
         }
 
+		// Begin test for converting binary back to assembly
 		printf("TEST COMMAND BINARY TO ASSEMBLY: %s\n", tests[i].command);
 
-		moddedBinary2assembly(appendTo);
+		moddedBinary2assembly(appendTo); // Converts binary back to assembly
 
+		// Handles passing and failing cases
 		if (strcmp(temp, tests[i].command) == 0) {
             puts("BINARY TO ASSEMBLY TEST PASSED");
         } else {
