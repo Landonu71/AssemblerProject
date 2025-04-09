@@ -9,6 +9,7 @@
 
 // buffer size constant
 #define BUFF_SIZE 100
+void moddedBinary2assembly(char* buff);
 void moddedAssembly2machine(char* buff);
 void moddedHex2assembly(char* buff);
 /*

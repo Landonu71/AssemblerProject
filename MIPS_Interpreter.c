@@ -83,15 +83,16 @@ void testBench(void) {
 
 	typedef struct {
         char command[50];
-        char expected[50];
+        char expected1[50];
+		char expected2[50];
     } TestCase;
 
 	TestCase tests[] = {
-        {"AND $t1, $t2, $t3", "0000 0001 0100 1011 0100 1000 0010 0100"},
-        {"OR $t0, $t1, $t2",  "0000 0001 0010 1010 0100 0000 0010 0101"},
-        {"ADD $s0, $s1, $s2", "0000 0010 0011 0010 1000 0000 0010 0000"},
-        {"BNE $t0, $t1, #42",  "0001 0101 0010 1000 0000 0000 0010 1010"},
-        {"SLTI $t2, $t3, #-5", "0010 1001 0110 1010 1111 1111 1111 1011"}
+        {"AND $t1, $t2, $t3", "0000 0001 0100 1011 0100 1000 0010 0100", "0x014B4824"},
+        {"ADD $s0, $s1, $s2", "0000 0010 0011 0010 1000 0000 0010 0000", "0x02328020"},
+        {"BNE $t0, $t1, #42",  "0001 0101 0010 1000 0000 0000 0010 1010", "0x1528002A"},
+        {"SLTI $t2, $t3, #5", "0010 1001 0110 1010 0000 0000 0000 0101", "0x296A0005"},
+		{"OR $t0, $t1, $t2",  "0000 0001 0010 1010 0100 0000 0010 0101", "0x012A4025"}
     };
 
 	// Initiazlies the test case char array and adds all test cases
@@ -136,14 +137,15 @@ void testBench(void) {
 
 	// Loops through every test case 
 	for(int i = 0; i < numTests; i++) {
+		char command[50];  
+		strcpy(command, tests[i].command);
 		
-		// For some reason, the test cases will not print correctly after the first one.  I have no idea why.
 		printf("TEST %d/%d: %s\n", i+1, numTests, tests[i].command);
 
 		// Calls the modded assembly to machine function to convert the test case to binary
-		moddedAssembly2machine(testCases[i]);
-
+		moddedAssembly2machine(command);
 		x = 0;
+
 		// Loops through every bit in the BIN32 variable and copies the each bit to the actualBinary array
 		for (int y = 31; y >= 0; y--) {
 			
@@ -158,15 +160,14 @@ void testBench(void) {
 
 		// Null terminates the string
 		actualBinary[x] = '\0';
-
 		// Prints "TEST PASSED" if the test case passed, otherwise prints "TEST FAILED" and the expected and actual results
-		if(strcmp(actualBinary, expectedResults[i]) == 0) {
+		if(strcmp(actualBinary, tests[i].expected1) == 0) {
 			puts("TEST PASSED");
 		}
 
 		else {
 			puts("TEST FAILED");
-			printf("EXPECTED BINARY: %s\n", expectedResults[i]);
+			printf("EXPECTED BINARY: %s\n", tests[i].expected1);
 			printf("ACTUAL BINARY: %s\n", actualBinary);
 			break;
 		}
@@ -190,10 +191,29 @@ void testBench(void) {
 				printf("ACTUAL HEX: %s\n", appendTo);
 				break;
 			}
-
-
 		}
-	}
+
+		for(int k = 0; k < numTests; k++) {
+			char newInstruct[50];
+			char appendTo[50] = "0x0";
+			printf("TEST COMMAND BINARY TO ASSEMBLY: %s\n", expectedHexResults[k]);
+
+			moddedBinary2assembly(expectedHexResults[k]);
+			itoa(instruct, newInstruct, 16);
+			strcat(appendTo, newInstruct);
+
+			if(strcmp(appendTo, expectedHexResults[k]) == 0) {
+				puts("TEST PASSED");
+			}
+	
+			else {
+				puts("TEST FAILED");
+				printf("EXPECTED HEX: %s\n", expectedHexResults[k]);
+				printf("ACTUAL HEX: %s\n", appendTo);
+				break;
+			}
+		}
+	}	
 }
 
 /*
@@ -272,6 +292,29 @@ void machine2assembly(char* buff) {
 		}
 	}
 }
+
+void moddedBinary2assembly(char* buff) {
+	
+	// prompts and takes input
+	char* test = malloc(strlen(buff) + 1);
+	strcpy(test, buff);
+
+	// if the string is empty, go back to the previous menu
+	if (strlen(buff) == 0) {
+		return;
+	}
+
+	// tries to parse the number
+	parseBin(buff);
+
+	// checks if there was an error, and decodes if there wasn't
+	if (state == NO_ERROR) {
+		decode();
+	}
+	
+}
+
+
 void moddedHex2assembly(char* buff) {
 		
 	// prompts and takes input
