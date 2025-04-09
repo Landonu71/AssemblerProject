@@ -140,12 +140,11 @@ void testBench(void) {
 
         // Compare generated binary and hex strings to expected outputs
         if (strcmp(actualBinary, tests[i].expected1) == 0 && strcmp(appendTo, tests[i].expected2) == 0) {
-            puts("ASSEMBLY TO BINARY AND HEX TEST PASSED");
+            puts("ASSEMBLY TO HEX TEST PASSED");
         } else {
             // Print error and exit loop if there's a mismatch
             puts("ASSEMBLY TO BINARY AND HEX TEST FAILED");
-            printf("EXPECTED BINARY: %s\n", tests[i].expected1);
-            printf("ACTUAL BINARY:   %s\n", actualBinary);
+            
             printf("EXPECTED HEX:    %s\n", tests[i].expected2);
             printf("ACTUAL HEX:      %s\n", appendTo);
             break;
@@ -158,9 +157,22 @@ void testBench(void) {
         char* temp = getAssemblyString();     // Retrieve generated assembly string
 
         if (strcmp(temp, tests[i].command) == 0) {
-            puts("MACHINE CODE TO ASSEMBLY TEST PASSED");
+            puts("HEX CODE TO ASSEMBLY TEST PASSED");
         } else {
             puts("HEX TO ASSEMBLY TEST FAILED");
+            printf("EXPECTED COMMAND: %s\n", tests[i].command);
+            printf("ACTUAL COMMAND:   %s\n", temp);
+            break;
+        }
+
+		printf("TEST COMMAND BINARY TO ASSEMBLY: %s\n", tests[i].command);
+
+		moddedBinary2assembly(appendTo);
+
+		if (strcmp(temp, tests[i].command) == 0) {
+            puts("BINARY TO ASSEMBLY TEST PASSED");
+        } else {
+            puts("BINARY TO ASSEMBLY TEST FAILED");
             printf("EXPECTED COMMAND: %s\n", tests[i].command);
             printf("ACTUAL COMMAND:   %s\n", temp);
             break;
@@ -247,23 +259,20 @@ void machine2assembly(char* buff) {
 
 void moddedBinary2assembly(char* buff) {
 	
-	// prompts and takes input
-	char* test = malloc(strlen(buff) + 1);
-	strcpy(test, buff);
+		// prompts and takes input
+		memset(buff, '\0', BUFF_SIZE);
+		char* test = malloc(strlen(buff) + 1);
+		strcpy(test, buff);
 
-	// if the string is empty, go back to the previous menu
-	if (strlen(buff) == 0) {
-		return;
-	}
+		// tries to parse the number
+		parseBin(buff);
 
-	// tries to parse the number
-	parseBin(test);
+		// checks if there was an error, and decodes if there wasn't
+		if (state == NO_ERROR) {
+			decode();
+		}
 
-	// checks if there was an error, and decodes if there wasn't
-	if (state == NO_ERROR) {
-		decode();
-	}
-	
+		// either prints an error message or the encoded instruction
 }
 
 
@@ -309,6 +318,7 @@ void moddedAssembly2machine(char* buff) {
 
 	
 }
+
 
 
 /*
