@@ -12,6 +12,10 @@
 void moddedBinary2assembly(char* buff);
 void moddedAssembly2machine(char* buff);
 void moddedHex2assembly(char* buff);
+char* getParamString(struct Param* param, char* buffer, size_t size);
+char* getAssemblyString(void);
+char* setAssm(void);
+char* makeParam(struct Param* param);
 /*
 	Purpose: runs the test bench for the program
 	Params: none
