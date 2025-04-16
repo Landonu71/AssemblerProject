@@ -74,6 +74,7 @@ void test(void) {
 
 void testBench(void) {
 
+	int passes = 50;
     // Prints out the test bench header
     puts("");
     puts("/===========================/");
@@ -144,7 +145,7 @@ void testBench(void) {
 		{"ADD $zero, $zero, $zero", "0000 0000 0000 0000 0000 0000 0010 0000", "0x020"},
 		{"ADDI $t0, $zero, #32767", "0010 0000 0000 1000 0111 1111 1111 1111", "0x20087fff"},
 		{"AND $t0, $zero, $zero", "0000 0000 0000 0000 0100 0000 0010 0100", "0x04024"},
-		{"ORI $t0, $zero, #65535", "0011 0100 0000 1000 1111 1111 1111 1111", "0x3408ffff"},
+		{"ORI $t0, $zero, #65535", "This should fail", "0x3408ffff"},
 		{"ADDI $t0, $zero, #32767", "0010 0000 0000 1000 0111 1111 1111 1111", "0x20087fff"}
     };
 
@@ -159,7 +160,7 @@ void testBench(void) {
     for (int i = 0; i < numTests; i++) {
         char command[50];
         strcpy(command, tests[i].command);  // Copy current command into local buffer
-
+		puts("");
         printf("TEST %d/%d: %s\n", i + 1, numTests, tests[i].command);
 
         // Convert assembly instruction to machine code (binary and hex)
@@ -199,7 +200,7 @@ void testBench(void) {
             printf("ACTUAL BINARY:      %s\n", actualBinary);
             printf("EXPECTED HEX:    %s\n", tests[i].expected2);
             printf("ACTUAL HEX:      %s\n", appendTo);
-            break;
+			passes--;
         }
 
         // Begin test for converting hex back to assembly
@@ -215,7 +216,7 @@ void testBench(void) {
             puts("HEX TO ASSEMBLY TEST FAILED");
             printf("EXPECTED COMMAND: %s\n", tests[i].command);
             printf("ACTUAL COMMAND:   %s\n", temp);
-            break;
+			passes--;
         }
 
 		// Begin test for converting binary back to assembly
@@ -230,14 +231,16 @@ void testBench(void) {
             puts("BINARY TO ASSEMBLY TEST FAILED");
             printf("EXPECTED COMMAND: %s\n", tests[i].command);
             printf("ACTUAL COMMAND:   %s\n", temp);
-            break;
+			passes--;
         }
     }
-	puts("");
-	puts("/===========================/");
-	puts("ALL TESTS PASSED!");
-	puts("/===========================/");
-	puts("");
+	
+		puts("");
+		puts("/===========================/");
+		printf("%i/50 TESTS PASSED!\n", passes);
+		puts("/===========================/");
+		puts("");
+	
 }
 
 /*
