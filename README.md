@@ -1,6 +1,6 @@
 # MIPS-Translatron 3000
 
-A C-based MIPS assembler and disassembler tool for converting between MIPS assembly and machine code. Developed by ByteForge Systems.
+A C-based MIPS assembler and disassembler tool for converting between MIPS assembly and machine code.
 
 ## Features
 
@@ -79,13 +79,3 @@ Follow the prompts to enter instructions or machine code.
 ## Testing
 
 To run the built-in test bench, select the "Test Bench" option from the main menu. This will automatically verify encoding and decoding for a suite of instructions.
-
-## Authors
-
-- Andrew Gautier
-- Ol' Jim
-- Ian Jackson
-
-## License
-
-This project is for educational purposes.
